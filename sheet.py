@@ -86,15 +86,9 @@ def push_column(shapePL,sorted_shape_list,sheet):
     for i in range(len(shapePL)):
         if(shapeSP[i][2] >0):
             item_rows, item_cols = sorted_shape_list[i].shape
-        #     sheet[shapePL[i][0]:shapePL[i][0]+item_rows +1,
-        #   shapePL[i][1]:shapePL[i][1]+item_cols +1] *= 0
-            # for j in range(shapePL[i][0],-1,-1):
-            #     for k in range(sorted_shape_list[i].shape[1]):
-            #         if(sheet[j][k] == 1):
-            #             break
-            #     return j
-    #         sheet[(shapePL[i][0]- j):(shapePL[i][0]-j)+(item_rows),
-    #                 shapePL[i][1]:shapePL[i][1]+item_cols] += sorted_shape_list[i]
+            sheet[shapePL[i][0]:shapePL[i][0]+item_rows +1,
+            shapePL[i][1]:shapePL[i][1]+item_cols +1] *= 0
+
             j = shapePL[i][0] - 1  # Start searching from the row above the current position
             while j >= 0:
                 if np.any(sheet[j, shapePL[i][1]:shapePL[i][1] + item_cols] == 1):
