@@ -5,13 +5,10 @@ import matplotlib.pyplot as plt
 
 # --------------------------------
 
-m = 11000
-n = 11000
+
+m = 6000
+n = 7000
 sheet = np.zeros((m, n), dtype=int)
-
-
-def rotate_matrix(matrix):
-    return np.rot90(matrix, k=1)
 
 
 def import_images_list(folder_path):
@@ -20,15 +17,8 @@ def import_images_list(folder_path):
     for filename in os.listdir(folder_path):
         if filename.endswith(('.jpg', '.jpeg', '.png')):
             image_path = os.path.join(folder_path, filename)
-            image = np.flip(np.array(Image.open(image_path).convert("L")), axis=0)
-
-            # Check the height and width of the image
-            height, width = image.shape
-
-            # If the height-to-width ratio is greater than 1, rotate the image
-            if (height / width > 1.5):
-                image = rotate_matrix(image)
-
+            image = np.flip(
+                np.array(Image.open(image_path).convert("L")), axis=0)
             images.append(np.where(image >= threshold, 0, 1))
     return images
 
@@ -39,33 +29,23 @@ def images_area(arr):
 
 address = "./test"
 
+
 sorted_shape_list = sorted(import_images_list(
-    address), key=images_area, reverse=True)
+    address), key=len, reverse=True)
 
 
 def placing_items(sheet, col_index, row_index, item):
     small_rows, small_cols = item.shape
-    # Check if we can push the shape further down
-    while row_index > 0 and can_push_down(sheet, row_index, col_index, small_cols):
-        row_index -= 1
-
-    # Check if we can push the shape further left
-    while col_index > 0 and can_push_left(sheet, row_index, col_index, small_rows):
-        col_index -= 1
-
-    # Place the shape in the calculated position
+    # Clear the area in the sheet before adding the new shape
     sheet[row_index:row_index + small_rows, col_index:col_index + small_cols] = 0
     sheet[row_index:row_index + small_rows, col_index:col_index + small_cols] += item
     return sheet
 
-
-def can_push_left(sheet, row_index, col_index, item_rows):
+def can_push_left(sheet, row_index, col_index, item_rows, item_cols):
     return not np.any(sheet[row_index:row_index + item_rows, col_index - 1:col_index] == 1)
 
-
 def can_push_down(sheet, row_index, col_index, item_cols):
-    return not np.any(sheet[row_index-1:row_index, col_index:col_index + item_cols] == 1)
-
+    return not np.any(sheet[row_index - 1:row_index, col_index:col_index + item_cols] == 1)
 
 row_index = 0
 col_index = 0
@@ -81,23 +61,21 @@ for i in range(len(sorted_shape_list)):
         row_index += max_row
         box_num += 1
 
+    # Check if we can push the shape further left
+    while col_index > 0 and can_push_left(sheet, row_index, col_index, small_rows, small_cols):
+        col_index -= 1
+
+    # Check if we can push the shape further down
+    while row_index > 0 and can_push_down(sheet, row_index, col_index, small_rows, small_cols):
+        row_index -= 1
+
     sheet = placing_items(sheet, col_index, row_index, sorted_shape_list[i])
     shapeSP[i] = np.array([row_index, col_index, box_num])
     col_index += small_cols
     max_row = max(max_row, small_rows)
 
 
-def scanner(page):
-    filled_rows = 0
-    for i in range(page.shape[0]):
-        for j in range(page.shape[1]):
-            if (sheet[i][j] == 1):
-                filled_rows += 1
-                break
-
-    return ((page.shape[0]-filled_rows))/page.shape[0]
-
-
 plt.contourf(sheet, cmap='gray')
 plt.colorbar()
 plt.show()
+
