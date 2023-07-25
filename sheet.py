@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 # --------------------------------
 
-m = 8000
-n = 8000
+m = 1500
+n = 1000
 sheet = np.zeros((m, n), dtype=int)
 
 
@@ -99,35 +99,35 @@ def filledSpaceScanner(page):
 
 maximumFilledRows = filledSpaceScanner(sheet)[0]
 
-def move_smaller_items_to_right(sheet, item, maxFilledRows, shapePosition):
+def move_smaller_items_to_right(sheet, item_list, maxFilledRows, shapePosition):
     sheet_rows, sheet_cols = sheet.shape
-    item_rows, item_cols = item.shape
-
-    active_line = 0
     
-    while active_line < maxFilledRows:
-        found_1 = False
-        insert_col = sheet_cols - item_cols
-        
-        # Search the right side of the sheet for the size of the item
-        for j in range(sheet_cols - 1, sheet_cols - 1 - item_cols, -1):
-            if 1 in sheet[active_line:active_line + item_rows, j]:
-                found_1 = True
-                insert_col = j + 1
+    for m in range(len(item_list)-1,0,-1):
+        item_rows, item_cols = item_list[m].shape
+        active_line = 0
+        while active_line < maxFilledRows:
+            found_1 = False
+            insert_col = sheet_cols - item_cols
+            # Search the right side of the sheet for the size of the item
+            for j in range(sheet_cols - 1, sheet_cols - 1 - item_cols, -1):
+                if 1 in sheet[active_line:active_line + item_rows, j]:
+                    found_1 = True
+                    insert_col = j + 1
+                    break
+            
+            if found_1:
+                # If 1 is found, add the line value to the active line and resume the search
+                active_line += 1
+            else:
+                # If 1 is not found, place the item at that point and continue the search
+                sheet[shapePosition[m][0]:shapePosition[m][0]+item_rows, shapePosition[m][1]:shapePosition[m][1]+ item_cols] = 0
+                sheet[active_line:active_line + item_rows, insert_col:insert_col + item_cols] = item_list[m]
+                active_line += item_rows
                 break
-        
-        if found_1:
-            # If 1 is found, add the line value to the active line and resume the search
-            active_line += 1
-        else:
-            # If 1 is not found, place the item at that point and continue the search
-            sheet[shapePosition[11][0]:shapePosition[11][0]+item_rows, shapePosition[11][1]:shapePosition[11][1]+ item_cols] = 0
-            sheet[active_line:active_line + item_rows, insert_col:insert_col + item_cols] = item
-            break
 
     return sheet
 
-move_smaller_items_to_right = move_smaller_items_to_right(sheet,sorted_shape_list[11],filledSpaceScanner(sheet)[0],shapeSP)
+move_smaller_items_to_right = move_smaller_items_to_right(sheet,sorted_shape_list,filledSpaceScanner(sheet)[0],shapeSP)
 
 plt.contourf(sheet, cmap='gray')
 plt.colorbar()
