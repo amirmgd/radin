@@ -99,18 +99,15 @@ def filledSpaceScanner(page):
 
 maximumFilledRows = filledSpaceScanner(sheet)[0]
 
+
 def move_smaller_items_to_right(sheet, item_list, maxFilledRows, shapePosition):
     sheet_rows, sheet_cols = sheet.shape
-    
     for m in range(len(item_list)-1,0,-1):
         item_rows, item_cols = item_list[m].shape
         highest_section = shapePosition[len(shapePosition)-1][2]
         active_line = 0
-        
         if(shapePosition[i][2] == highest_section):
             while active_line + item_rows < maxFilledRows:
-                # print("active row:",active_line)
-                # print("max Row:",maxFilledRows)
                 found_1 = False
                 insert_col = sheet_cols - item_cols
                     # Search the right side of the sheet for the size of the item
@@ -124,7 +121,8 @@ def move_smaller_items_to_right(sheet, item_list, maxFilledRows, shapePosition):
                     # If 1 is found, add the line value to the active line and resume the search
                     active_line += 1
                 else:
-                    # If 1 is not found, place the item at that point and continue the search
+                    while col_index > 0 and can_push_left(sheet, active_line, insert_col, small_rows):
+                        insert_col -= 1
                     sheet[shapePosition[m][0]:shapePosition[m][0]+item_rows, shapePosition[m][1]:shapePosition[m][1]+ item_cols] = 0
                     sheet[active_line:active_line + item_rows, insert_col:insert_col + item_cols] = item_list[m]
                     active_line += item_rows
