@@ -1,3 +1,3 @@
-# A Project for Radin signboard factory
+# A nesting project for Radin Sign Factory
 
-## In this project we are trying to arrange shapes into a specified size sheet with the minimum wasted space
+# Our main goal here is to arrange shpes in a rectangular sheet with the minimum wasted space.
